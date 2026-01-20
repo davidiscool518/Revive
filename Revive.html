@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Revive</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+  --main:#2c6e49;
+  --accent:#d9c46a;
+}
+
+* { box-sizing:border-box; font-family:Segoe UI, sans-serif; }
+
+body {
+  margin:0;
+  background:linear-gradient(to bottom,#f4f9f6,#e6f0eb);
+}
+
+header {
+  background:linear-gradient(135deg,var(--main),#1b4332);
+  color:white;
+  text-align:center;
+  padding:2.5rem 1rem;
+}
+
+main {
+  max-width:1200px;
+  margin:auto;
+  padding:2rem 1rem;
+}
+
+.hidden { display:none; }
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1.5rem;
+}
+
+.card {
+  background:white;
+  border-radius:16px;
+  padding:1.5rem;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+  cursor:pointer;
+  transition:.3s;
+}
+
+.card:hover { transform:translateY(-6px); }
+
+.lesson-box {
+  background:white;
+  border-radius:16px;
+  padding:2rem;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+}
+
+.word { font-size:1.5rem; font-weight:bold; }
+.translit { font-style:italic; color:#666; }
+.translation { margin-bottom:1rem; }
+
+button {
+  border:none;
+  border-radius:999px;
+  padding:.6rem 1.2rem;
+  background:var(--main);
+  color:white;
+  cursor:pointer;
+  margin:.4rem .2rem;
+}
+
+button:hover { background:#1b4332; }
+
+input {
+  width:100%;
+  padding:.6rem;
+  border-radius:8px;
+  border:1px solid #ccc;
+  margin:.6rem 0;
+}
+
+footer {
+  text-align:center;
+  padding:2rem;
+  background:#1b4332;
+  color:white;
+  margin-top:4rem;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🌍 Living Languages</h1>
+  <p>Teach · Preserve · Learn</p>
+</header>
+
+<main>
+
+<!-- LANGUAGE MENU -->
+<div id="languages">
+  <h2>Select a Language</h2>
+  <div class="grid">
+    <div class="card" onclick="openLanguage('Irish')">Irish</div>
+    <div class="card" onclick="openLanguage('Welsh')">Welsh</div>
+    <div class="card" onclick="openLanguage('Ainu')">Ainu</div>
+    <div class="card" onclick="openLanguage('TerSami')">Ter Sámi</div>
+
+    <div class="card" onclick="openLanguage('Manchu')">Manchu</div>
+    <div class="card" onclick="openLanguage('Picard')">Picard</div>
+    <div class="card" onclick="openLanguage('LowSaxon')">Low Saxon</div>
+    <div class="card" onclick="openLanguage('Gondi')">Gondi</div>
+
+    <div class="card" onclick="openLanguage('German')">German</div>
+    <div class="card" onclick="openLanguage('Japanese')">Japanese</div>
+    <div class="card" onclick="openLanguage('Chinese')">Chinese</div>
+    <div class="card" onclick="openLanguage('Hindi')">Hindi</div>
+    <div class="card" onclick="openLanguage('Arabic')">Arabic</div>
+  </div>
+</div>
+
+<!-- LESSON -->
+<div id="lesson" class="hidden">
+  <h2 id="languageTitle"></h2>
+
+  <div class="lesson-box">
+    <h3 id="levelTitle"></h3>
+    <div id="content"></div>
+
+    <button onclick="nextLevel()">Continue</button>
+    <button onclick="back()">Back</button>
+  </div>
+</div>
+
+</main>
+
+<footer>🌱 Every language matters</footer>
+
+<script>
+let currentLanguage = "";
+let level = 0;
+let requiresTyping = false;
+
+const lessons = {
+  Irish: [
+    [["Dia duit","","hello"]],
+    [["Go raibh maith agat","","thank you"]],
+    [["Tá","","yes"]],
+    [["Conas atá tú?","","how are you"]],
+    [["Oíche mhaith","","good night"]]
+  ],
+  Welsh: [
+    [["Helo","","hello"]],
+    [["Diolch","","thank you"]],
+    [["Ie","","yes"]],
+    [["Sut wyt ti?","","how are you"]],
+    [["Nos da","","good night"]]
+  ],
+  Ainu: [
+    [["Irankarapte","","hello"]],
+    [["Iyairaykere","","thank you"]],
+    [["Ku=an","","I"]],
+    [["E=an","","you"]],
+    [["Kamuy","","spirit"]]
+  ],
+  TerSami: [
+    [["Terve","","hello"]],
+    [["Kiitos","","thank you"]],
+    [["Mun","","I"]],
+    [["Tun","","you"]],
+    [["Jieʹnn","","night"]]
+  ],
+  Manchu: [
+    [["ᡥᠠᡳ","hai","hello"]],
+    [["ᡥᡡᠸᠠᠯᡳ","huwali","thanks"]],
+    [["ᠪᡝ","be","I"]],
+    [["ᡤᡳᠰᡠᠨ","gisun","language"]],
+    [["ᡥᠠᡳ ᠪᡝ","hai be","hello I"]]
+  ],
+  Picard: [
+    [["Bonjorn","","hello"]],
+    [["Merci","","thank you"]],
+    [["Oé","","yes"]],
+    [["Commin t'es?","","how are you"]],
+    [["Bonn nuée","","good night"]]
+  ],
+  LowSaxon: [
+    [["Moin","","hello"]],
+    [["Dank di","","thank you"]],
+    [["Jo","","yes"]],
+    [["Wo geiht di?","","how are you"]],
+    [["Gode Nacht","","good night"]]
+  ],
+  Gondi: [
+    [["Namaskar","","hello"]],
+    [["Dhanyavaad","","thank you"]],
+    [["Ha","","yes"]],
+    [["Nee etta?","","how are you"]],
+    [["Raati","","night"]]
+  ],
+  German: [
+    [["Hallo","","hello"]],
+    [["Danke","","thank you"]],
+    [["Ja","","yes"]],
+    [["Wie geht's?","","how are you"]],
+    [["Gute Nacht","","good night"]]
+  ],
+  Japanese: [
+    [["こんにちは","konnichiwa","hello"]],
+    [["ありがとう","arigatō","thank you"]],
+    [["はい","hai","yes"]],
+    [["元気ですか","genki desu ka","how are you"]],
+    [["おやすみ","oyasumi","good night"]]
+  ],
+  Chinese: [
+    [["你好","nǐ hǎo","hello"]],
+    [["谢谢","xièxie","thank you"]],
+    [["是","shì","yes"]],
+    [["你好吗","nǐ hǎo ma","how are you"]],
+    [["晚安","wǎn ān","good night"]]
+  ],
+  Hindi: [
+    [["नमस्ते","namaste","hello"]],
+    [["धन्यवाद","dhanyavād","thank you"]],
+    [["हाँ","hā̃","yes"]],
+    [["आप कैसे हैं","āp kaise hain","how are you"]],
+    [["शुभ रात्रि","shubh rātri","good night"]]
+  ],
+  Arabic: [
+    [["مرحبا","marḥabā","hello"]],
+    [["شكراً","shukran","thank you"]],
+    [["نعم","naʿam","yes"]],
+    [["كيف حالك","kayfa ḥāluk","how are you"]],
+    [["مساء الخير","masāʾ al-khayr","good evening"]]
+  ]
+};
+
+function openLanguage(lang){
+  currentLanguage = lang;
+  level = 0;
+  document.getElementById("languages").classList.add("hidden");
+  document.getElementById("lesson").classList.remove("hidden");
+  document.getElementById("languageTitle").textContent = lang;
+  loadLevel();
+}
+
+function isLatin(text){
+  return /^[A-Za-z\s'=?.]+$/.test(text);
+}
+
+function loadLevel(){
+  const c = document.getElementById("content");
+  c.innerHTML = "";
+
+  const item = lessons[currentLanguage][level][0];
+  const word = item[0];
+
+  requiresTyping = isLatin(word);
+
+  document.getElementById("levelTitle").textContent =
+    `Level ${level + 1} of 5`;
+
+  c.innerHTML += `
+    <div class="word">${item[0]}</div>
+    ${item[1] ? `<div class="translit">${item[1]}</div>` : ""}
+    <div class="translation">${item[2]}</div>
+  `;
+
+  if (requiresTyping) {
+    c.innerHTML += `
+      <p>Type the word:</p>
+      <input id="typeInput">
+    `;
+  }
+}
+
+function nextLevel(){
+  if (requiresTyping) {
+    const typed = document.getElementById("typeInput").value.trim();
+    const expected = lessons[currentLanguage][level][0][0];
+    if (typed !== expected) {
+      alert("Type it exactly as shown.");
+      return;
+    }
+  }
+
+  if (level < 4) {
+    level++;
+    loadLevel();
+  } else {
+    alert("🎉 Language completed!");
+    back();
+  }
+}
+
+function back(){
+  document.getElementById("lesson").classList.add("hidden");
+  document.getElementById("languages").classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
